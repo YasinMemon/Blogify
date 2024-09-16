@@ -26,5 +26,31 @@
             <h5 class="mt-2"><%= blog.postedBy.fullName %></h5>
         </div>
     </div>
+    <%if(locals.user){ %>
+        <div class="comments container mt-2 mb-2">
+            <form action="/blog/comment/<%= blog._id %>/" method="post">
+                <input 
+                name="content"
+                style="width: 100%;"
+                type="text"
+                placeholder="Enter your comments here"
+                >
+                <button 
+                class="btn btn-md mt-2 btn-primary"
+                type="submit">Add</button>
+            </form>
+        </div>
+    <% } %>
+
+    <div class="allComments container">
+        <h1>Comments (<%= comments.length  %>)</h1>
+        <% comments.forEach(comment => { %>
+            <br>
+           <img src="<%= blog.postedBy.profileImgURL %>" height="50vh">
+           <%= blog.postedBy.fullName %> :
+           <%= comment.content %>
+        <% }); %>
+    </div>
+    
 </body>
 </html>

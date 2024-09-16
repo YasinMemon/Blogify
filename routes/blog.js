@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const blogModel = require("../models/blog");
+const commentModel = require("../models/commets");
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
@@ -14,6 +15,18 @@ const storage = multer.diskStorage({
 });
 
 const uploads = multer({ storage })
+
+router.post("/comment/:blogID", async (req, res) => {
+
+    await commentModel.create({
+        content: req.body.content,
+        blogID: req.params.blogID,
+        createdBy: req.user._id,
+    });
+
+    return res.redirect(`/blog/${req.params.blogID}`);
+
+})
 
 router.get("/add-blog", (req,res) => {
     res.render("addBlog", {
@@ -38,12 +51,13 @@ router.post("/add-blog", uploads.single('coverimg'), async (req,res) => {
 
 router.get("/:id", async (req,res) => {
     const blog = req.params.id;
+    const comments = await commentModel.find({ blogID: blog }).populate('createdBy');
     const perticularBlog = await blogModel.findOne({_id: blog}).populate('postedBy');
-    console.log(perticularBlog);
     
     return res.render("blog", {
         user: req.user,
         blog: perticularBlog,
+        comments
     });
 });
 
